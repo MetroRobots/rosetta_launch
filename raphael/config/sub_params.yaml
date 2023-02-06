@@ -1,0 +1,5 @@
+anonymous_name: $(anon leo)
+favorite_brother: $(optenv BROTHER_NAME mikey)
+package_location: $(find rospy)
+directory: $(dirname)
+version: ROS $(env ROS_VERSION)

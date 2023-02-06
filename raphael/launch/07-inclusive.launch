@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find raphael)/launch/05-arg.launch">
+        <arg name="pizza_type" value="olives" />
+    </include>
+</launch>

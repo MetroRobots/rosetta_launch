@@ -1,0 +1,4 @@
+<launch>
+    <param name="robot_description" command="$(find xacro)/xacro $(find urdf_tutorial)/urdf/01-myfirst.urdf" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+</launch>

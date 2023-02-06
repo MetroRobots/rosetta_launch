@@ -1,0 +1,12 @@
+<launch>
+    <param name="use_sim_time" value="true" />
+
+    <node name="cool_but_rude" pkg="raphael" type="raphael_node" output="screen">
+        <param name="pizza" value="pepperoni" />
+        <param name="brothers" type="yaml" value="[leo, don, mike]"/>
+        <rosparam param="coworkers">[leo, don, mike]</rosparam>
+        <rosparam>
+            weapon: sai
+        </rosparam>
+    </node>
+</launch>

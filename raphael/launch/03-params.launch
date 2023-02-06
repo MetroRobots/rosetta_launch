@@ -1,0 +1,5 @@
+<launch>
+    <node name="cool_but_rude" pkg="raphael" type="raphael_node" output="screen">
+        <rosparam command="load" file="$(find raphael)/config/params.yaml" />
+    </node>
+</launch>

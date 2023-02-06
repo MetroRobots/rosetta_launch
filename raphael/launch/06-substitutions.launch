@@ -1,0 +1,9 @@
+<launch>
+    <arg name="radius" default="1.5" />
+    <arg name="pizza_type" default="pepperoni" />
+    <node name="cool_but_rude" pkg="raphael" type="raphael_node" output="screen">
+        <param name="pizza" value="$(arg pizza_type)" />
+        <param name="circumference" value="$(eval 2.* 3.1415 * arg('radius'))"/>
+        <rosparam command="load" file="$(find raphael)/config/sub_params.yaml" subst_value="true"/>
+    </node>
+</launch>

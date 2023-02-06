@@ -1,0 +1,5 @@
+<launch>
+    <arg name="use_number_one" default="true" />
+    <include file="$(find raphael)/launch/01-single.launch"    if="$(arg use_number_one)" />
+    <include file="$(find raphael)/launch/02-param.launch" unless="$(arg use_number_one)" />
+</launch>

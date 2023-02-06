@@ -1,0 +1,4 @@
+<launch>
+    <node name="cool_but_rude" pkg="raphael" type="raphael_node" />
+    <node name="five_seconds" pkg="raphael" type="five_seconds" required="true" />
+</launch>

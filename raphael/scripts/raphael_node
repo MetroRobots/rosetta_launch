@@ -1,0 +1,8 @@
+#!/usr/bin/python3
+
+import rospy
+rospy.init_node('raphael')
+params = rospy.get_param('~', {})
+for k, v in params.items():
+    rospy.loginfo(f'Parameter {k}={v}')
+rospy.spin()
