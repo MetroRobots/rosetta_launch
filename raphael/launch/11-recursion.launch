@@ -1,7 +1,7 @@
 <launch>
     <arg name="N" default="10" />
     <node name="raphael_node$(arg N)" pkg="raphael" type="raphael_node" />
-    <include file="$(find raphael)/launch/11-recursion.launch" if="$(eval N > 0)">
+    <include file="$(find raphael)/launch/11-recursion.launch" if="$(eval N > 1)">
         <arg name="N" value="$(eval N - 1)" />
     </include>
 </launch>

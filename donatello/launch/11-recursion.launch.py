@@ -12,6 +12,6 @@ def generate_launch_description():
         launch_ros.actions.Node(name=['donatello_node', LaunchConfiguration('N')],
                                 package='donatello', executable='donatello_node'),
         IncludeLaunchDescription(str(get_package_share_path('donatello') / 'launch/11-recursion.launch.py'),
-                                 condition=IfCondition(PythonExpression([LaunchConfiguration('N'), '>0'])),
+                                 condition=IfCondition(PythonExpression([LaunchConfiguration('N'), '>1'])),
                                  launch_arguments={'N': PythonExpression([LaunchConfiguration('N'), '-1'])}.items()),
     ])
