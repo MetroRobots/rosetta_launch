@@ -31,3 +31,4 @@ repos:
   hooks:
   - id: flake8
   rev: 6.0.0
+autoupdate_schedule: quarterly
