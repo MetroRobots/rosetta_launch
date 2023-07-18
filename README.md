@@ -117,30 +117,38 @@ To load parameters from a file, we need the full path to the yaml file.
 ### ROS 2
 [source](donatello/launch/03-params.launch.py)
 ```python
-from ament_index_python.packages import get_package_share_path
 import launch
 import launch_ros.actions
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     return launch.LaunchDescription([
         launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
                                 parameters=[
-                                    str(get_package_share_path('donatello') / 'config/params.yaml')]),
+                                    [FindPackageShare('donatello'), '/config/params.yaml']]),
     ])
 ```
 
- * In the `parameters` argument of the Node, now we specify a string representing the full path (as opposed to the dictionary we used in the previous section) within the Python list.
- * To get the full path, there are two commonly used options:
-   * `ament_index_python.package.get_package_share_path`, cast to a string, as shown above.
-   * `ament_index_python.packages.get_package_share_directory` combined with `os.path.join`, e.g.
-      ```python
-      parameters=[
+* In the `parameters` argument of the Node, we previously specified a dictionary to give values to the parameters individually. To load the parameters from a file, we must specify the full path to the file, which we can do in three ways.
+  1. **FindPackageShare** (as shown above) - Instead of a dictionary, we now provide a list, where all the list elements are concatenated together. (See more information on Substitutions in a section below)
+  2. **String** - You can pass in a string representing the path. This is often combined with `ament_index_python.packages.get_package_share_directory` and `os.path.join`, i.e.
+    ```python
+    parameters=[
         os.path.join(get_package_share_directory('donatello'),
                      'config/params.yaml'
                      )
-      ]
-      ```
+                 ]
+    ```
+  3. **Path converted to a String** - Working with `pathlib` is often easier than using `os.path.join`. You can get a `pathlib.Path` of the share folder using `ament_index_python.package.get_package_share_path` i.e.
+    ```python
+    parameters=[
+        str(get_package_share_path('donatello') / 'config/params.yaml')
+                 ]
+    ```
+
+* While the latter two ways of specifying the path are common, if you are combining with other substitutions, the first option is the easiest to work with.
+
 
 ## 04 - Load Parameters from a Command
 Sometimes you will want to set parameters based on the results of running a command. This is very commonly seen when running `xacro` on your robot model and loading it in as a parameter.
@@ -157,16 +165,16 @@ Sometimes you will want to set parameters based on the results of running a comm
 ### ROS 2
 [source](donatello/launch/04-command-params.launch.py)
 ```python
-from ament_index_python.packages import get_package_share_path
 import launch
 from launch.substitutions import Command
 import launch_ros.actions
 from launch_ros.parameter_descriptions import ParameterValue
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     robot_description = ParameterValue(
-        Command(['xacro ', str(get_package_share_path('urdf_tutorial') / 'urdf/01-myfirst.urdf')]),
+        Command(['xacro ', FindPackageShare('urdf_tutorial'), '/urdf/01-myfirst.urdf']),
         value_type=str)
 
     return launch.LaunchDescription([
@@ -231,7 +239,7 @@ def generate_launch_description():
    ```
 
 ## 06 - Using Substitutions Everywhere
-In the previous example, we were able to dynamically change our launch file by using substitutions, i.e. dynamically replacing the value of a variable. There are actually a lot of different things you can substitute in.
+In the previous example, we were able to dynamically change our launch file by using substitutions, i.e. dynamically replacing the value of a variable. We also used `FindPackageShare` to dynamically find the path to a file. There are actually a lot of different things you can substitute in.
 
 | Name                          | ROS 1 command | ROS 2 command          | ROS2 Object         | Note |
 |-------------------------------|---------------|------------------------|---------------------|------|
@@ -244,6 +252,8 @@ In the previous example, we were able to dynamically change our launch file by u
 | ROS Package Location          | find          |                        |                     | [4]  |
 | Current Launch File Path      |               | filename               | ThisLaunchFile      | [4]  |
 | Executable Path               |               | find-exec              | FindExecutable      | [4]  |
+| ROS Executable                |               | exec-in-pkg            | ExecutableInPackage | [4]  |
+| ROS Package Share Path        |               | find-pkg-share         | FindPackageShare    | [4]  |
 | Expression Evaluation         | eval          | eval                   | PythonExpression    | [5]  |
 
  * [1] Only one with inexplicable different command in ROS 1 and 2
@@ -348,16 +358,16 @@ def generate_launch_description():
 
 [source](donatello/launch/06c-substitutions.launch.py)
 ```python
-from ament_index_python.packages import get_package_share_path
 import launch
 from launch.actions import DeclareLaunchArgument
 import launch_ros.actions
 from launch_ros.parameter_descriptions import ParameterFile
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     file_parameters = ParameterFile(
-        param_file=str(get_package_share_path('donatello') / 'config/sub_params.yaml'),
+        param_file=[FindPackageShare('donatello'), '/config/sub_params.yaml'],
         allow_substs=True
     )
 
@@ -388,14 +398,14 @@ In more complex systems, it is often useful to have launch files that include ot
 ### ROS 2
 [source](donatello/launch/07-inclusive.launch.py)
 ```python
-from ament_index_python.packages import get_package_share_path
 import launch
 from launch.actions import IncludeLaunchDescription
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     return launch.LaunchDescription([
-        IncludeLaunchDescription(str(get_package_share_path('donatello') / 'launch/05-arg.launch.py'),
+        IncludeLaunchDescription([FindPackageShare('donatello'), '/launch/05-arg.launch.py'],
                                  launch_arguments={'pizza_type': 'peppers'}.items()),
     ])
 ```
@@ -426,22 +436,22 @@ In this example, we combine the substitution functionality and the ability to in
 ### ROS 2
 [source](donatello/launch/08-conditional.launch.py)
 ```python
-from ament_index_python.packages import get_package_share_path
 import launch
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     return launch.LaunchDescription([
         DeclareLaunchArgument('use_number_one', default_value='True'),
         IncludeLaunchDescription(
-            str(get_package_share_path('donatello') / 'launch/01-single.launch.py'),
+            [FindPackageShare('donatello'), '/launch/01-single.launch.py'],
             condition=IfCondition(LaunchConfiguration('use_number_one')),
         ),
         IncludeLaunchDescription(
-            str(get_package_share_path('donatello') / 'launch/02-param.launch.py'),
+            [FindPackageShare('donatello'), '/launch/02-param.launch.py'],
             condition=UnlessCondition(LaunchConfiguration('use_number_one')),
         ),
     ])
@@ -474,15 +484,15 @@ One other way to dynamically change the contents of a launch file by evaluating 
 ### ROS 2
 [source](donatello/launch/09-dynamic-filename.launch.py)
 ```python
-from ament_index_python.packages import get_package_share_directory
 import launch
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 import launch_ros.actions
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    dynamic_param_path = [get_package_share_directory('donatello'), '/config/', LaunchConfiguration('config'), '.yaml']
+    dynamic_param_path = [FindPackageShare('donatello'), '/config/', LaunchConfiguration('config'), '.yaml']
 
     return launch.LaunchDescription([
         DeclareLaunchArgument('config', default_value='params'),
