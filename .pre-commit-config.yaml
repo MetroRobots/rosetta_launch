@@ -22,7 +22,7 @@ repos:
   - id: codespell
     args:
     - --write-changes
-  rev: v2.2.4
+  rev: v2.2.5
 - repo: https://github.com/pre-commit/mirrors-autopep8
   hooks:
   - id: autopep8
@@ -30,5 +30,29 @@ repos:
 - repo: https://github.com/PyCQA/flake8
   hooks:
   - id: flake8
-  rev: 6.0.0
-autoupdate_schedule: quarterly
+  rev: 6.1.0
+- repo: https://github.com/adrienverge/yamllint
+  hooks:
+  - id: yamllint
+    args:
+    - --format
+    - parsable
+    - --strict
+  rev: v1.32.0
+- repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+  hooks:
+  - id: yamlfmt
+    args:
+    - --width
+    - '120'
+    - --implicit_start
+    - --implicit_end
+    - --mapping
+    - '2'
+    - --sequence
+    - '2'
+    - --offset
+    - '0'
+  rev: 0.2.3
+ci:
+  autoupdate_schedule: quarterly
