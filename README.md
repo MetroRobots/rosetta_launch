@@ -543,6 +543,54 @@ def generate_launch_description():
  * Like so many things in ROS 2, the process for making a node required is more complicated, but also more flexible.
 
 
+## 11 - Launch from Code
+If you want to start a launch file from a script, you can sometimes use the `subprocess` Python library, but that can lead to problems with the paths. This is how you can launch a launch file in the ROS-y way.
+
+### ROS 1
+[source](raphael/scripts/manual_launch)
+```python
+#!/usr/bin/python3
+from catkin.find_in_workspaces import find_in_workspaces
+from roslaunch.parent import ROSLaunchParent
+from roslaunch import rlutil
+
+
+def main():
+    uuid = rlutil.get_or_generate_uuid(None, False)
+    launch_path = find_in_workspaces(project='raphael', path='launch/05-arg.launch', first_match_only=True)[0]
+    launch_with_args = (launch_path, ['pizza_type:=extra_cheese'])
+
+    p = ROSLaunchParent(uuid, [launch_with_args])
+    p.start()
+    p.spin()
+
+
+if __name__ == '__main__':
+    main()
+```
+ * This version starts `roscore`
+
+### ROS 2
+[source](donatello/donatello/manual_launch.py)
+```python
+from ros2launch.api import get_share_file_path_from_package, launch_a_launch_file
+
+
+def main():
+    path = get_share_file_path_from_package(package_name='donatello', file_name='05-arg.launch.py')
+    launch_arguments = ['pizza_type:=extra_cheese']
+
+    launch_a_launch_file(
+        launch_file_path=path,
+        # Note: launch_file_arguments is required!
+        launch_file_arguments=launch_arguments,
+    )
+
+
+if __name__ == '__main__':
+    main()
+```
+
 # Other Links
  * ROS 1
    * [ROS Wiki](http://wiki.ros.org/roslaunch/XML) with description of each XML element.

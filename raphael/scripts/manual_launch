@@ -1,0 +1,18 @@
+#!/usr/bin/python3
+from catkin.find_in_workspaces import find_in_workspaces
+from roslaunch.parent import ROSLaunchParent
+from roslaunch import rlutil
+
+
+def main():
+    uuid = rlutil.get_or_generate_uuid(None, False)
+    launch_path = find_in_workspaces(project='raphael', path='launch/05-arg.launch', first_match_only=True)[0]
+    launch_with_args = (launch_path, ['pizza_type:=extra_cheese'])
+
+    p = ROSLaunchParent(uuid, [launch_with_args])
+    p.start()
+    p.spin()
+
+
+if __name__ == '__main__':
+    main()

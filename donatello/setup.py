@@ -24,6 +24,7 @@ setup(
         'console_scripts': [
             'donatello_node = donatello.donatello_node:main',
             'five_seconds = donatello.five_seconds:main',
+            'manual_launch = donatello.manual_launch:main',
         ]
     },
 )
