@@ -1,8 +1,8 @@
-import launch
-import launch_ros.actions
+from launch import LaunchDescription
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node'),
+    return LaunchDescription([
+        Node(name='does_machines', package='donatello', executable='donatello_node'),
     ])

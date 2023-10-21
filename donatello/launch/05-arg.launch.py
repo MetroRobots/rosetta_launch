@@ -1,12 +1,14 @@
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
-import launch_ros.actions
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument('pizza_type', default_value='mushrooms'),
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
-                                parameters=[{'pizza': LaunchConfiguration('pizza_type')}]),
+        Node(name='does_machines',
+             package='donatello',
+             executable='donatello_node',
+             parameters=[{'pizza': LaunchConfiguration('pizza_type')}]),
     ])
