@@ -26,27 +26,29 @@ Three things are required for the minimal example:
 
 [source](donatello/launch/01-single.launch.py)
 ```python
-import launch
-import launch_ros.actions
+from launch import LaunchDescription
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node'),
+    return LaunchDescription([
+        Node(name='does_machines', package='donatello', executable='donatello_node'),
     ])
 ```
+You can choose whether you want to use the `import X` or `from X import Y` syntax. This guide uses the latter for the `launch` and `launch_ros` imports.
+
 
 There are actually several different "styles" for adding nodes to a launch description.
  1. You can construct the nodes directly in the list passed to the `LaunchDescription` constructor (as above)
  2. You can assign the nodes to a variable and then put them in the `LaunchDescription` constructor at the end.
     ```python
-    don_node = launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node')
-    return launch.LaunchDescription([don_node])
+    don_node = Node(name='does_machines', package='donatello', executable='donatello_node')
+    return LaunchDescription([don_node])
     ```
  3. You can construct the `LaunchDescription` first with no nodes, and then add them individually.
     ```python
-    ld = launch.LaunchDescription()
-    ld.add_action(launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node'))
+    ld = LaunchDescription()
+    ld.add_action(Node(name='does_machines', package='donatello', executable='donatello_node'))
     return ld
     ```
 
@@ -80,15 +82,17 @@ If we want to specify an exact value for a ROS parameter inside of the launch fi
 ### ROS 2
 [source](donatello/launch/02-param.launch.py)
 ```python
-import launch
-import launch_ros.actions
+from launch import LaunchDescription
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
-                                parameters=[{'pizza': 'mushrooms',
-                                             'brothers': ['leo', 'mike', 'raph']}]),
+    return LaunchDescription([
+        Node(name='does_machines',
+             package='donatello',
+             executable='donatello_node',
+             parameters=[{'pizza': 'mushrooms',
+                          'brothers': ['leo', 'mike', 'raph']}]),
     ])
 ```
  * You cannot set global parameters in ROS 2.
@@ -117,16 +121,17 @@ To load parameters from a file, we need the full path to the yaml file.
 ### ROS 2
 [source](donatello/launch/03-params.launch.py)
 ```python
-import launch
-import launch_ros.actions
+from launch import LaunchDescription
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
-                                parameters=[
-                                    [FindPackageShare('donatello'), '/config/params.yaml']]),
+    return LaunchDescription([
+        Node(name='does_machines',
+             package='donatello',
+             executable='donatello_node',
+             parameters=[[FindPackageShare('donatello'), '/config/params.yaml']]),
     ])
 ```
 
@@ -165,9 +170,9 @@ Sometimes you will want to set parameters based on the results of running a comm
 ### ROS 2
 [source](donatello/launch/04-command-params.launch.py)
 ```python
-import launch
+from launch import LaunchDescription
 from launch.substitutions import Command
-import launch_ros.actions
+from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
@@ -177,9 +182,10 @@ def generate_launch_description():
         Command(['xacro ', FindPackageShare('urdf_tutorial'), '/urdf/01-myfirst.urdf']),
         value_type=str)
 
-    return launch.LaunchDescription([
-        launch_ros.actions.Node(package='robot_state_publisher', executable='robot_state_publisher',
-                                parameters=[{'robot_description': robot_description}])
+    return LaunchDescription([
+        Node(package='robot_state_publisher',
+             executable='robot_state_publisher',
+             parameters=[{'robot_description': robot_description}])
     ])
 ```
 
@@ -217,17 +223,19 @@ There are two different steps for using command line arguments:
 ### ROS 2
 [source](donatello/launch/05-arg.launch.py)
 ```python
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
-import launch_ros.actions
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument('pizza_type', default_value='mushrooms'),
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
-                                parameters=[{'pizza': LaunchConfiguration('pizza_type')}]),
+        Node(name='does_machines',
+             package='donatello',
+             executable='donatello_node',
+             parameters=[{'pizza': LaunchConfiguration('pizza_type')}]),
     ])
 ```
  * The argument is declared using the `DeclareLaunchArgument` action, which must be included in the `LaunchDescription`
@@ -289,33 +297,33 @@ There are multiple ways to do substitutions in ROS 2 Python launch files.
 
 [source](donatello/launch/06a-substitutions.launch.py)
 ```python
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-import launch.substitutions
-import launch_ros.actions
+from launch.substitutions import AnonName, Command, EnvironmentVariable, FindExecutable, LaunchConfiguration
+from launch.substitutions import PythonExpression, ThisLaunchFile, ThisLaunchFileDir
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
     object_parameters = {
-        'pizza': launch.substitutions.LaunchConfiguration('pizza_type'),
-        'anonymous_name': launch.substitutions.AnonName('leo'),
-        'favorite_brother': launch.substitutions.EnvironmentVariable('BROTHER_NAME', default_value='mikey'),
-        'filename': launch.substitutions.ThisLaunchFile(),
-        'directory': launch.substitutions.ThisLaunchFileDir(),
-        'list_exec': launch.substitutions.FindExecutable(name='ls'),
-        'list_output': launch.substitutions.Command('ls'),
-        'version': ['ROS ', launch.substitutions.EnvironmentVariable('ROS_VERSION')],
-        'circumference': launch.substitutions.PythonExpression([
-            '2.*3.1415*',
-            launch.substitutions.LaunchConfiguration('radius')
-        ]),
+        'pizza': LaunchConfiguration('pizza_type'),
+        'anonymous_name': AnonName('leo'),
+        'favorite_brother': EnvironmentVariable('BROTHER_NAME', default_value='mikey'),
+        'filename': ThisLaunchFile(),
+        'directory': ThisLaunchFileDir(),
+        'list_exec': FindExecutable(name='ls'),
+        'list_output': Command('ls'),
+        'version': ['ROS ', EnvironmentVariable('ROS_VERSION')],
+        'circumference': PythonExpression(['2.*3.1415*', LaunchConfiguration('radius')]),
     }
 
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument('radius', default_value='1.5'),
         DeclareLaunchArgument('pizza_type', default_value='mushrooms'),
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
-                                parameters=[object_parameters]),
+        Node(name='does_machines',
+             package='donatello',
+             executable='donatello_node',
+             parameters=[object_parameters]),
     ])
 ```
 
@@ -326,9 +334,9 @@ def generate_launch_description():
 
 [source](donatello/launch/06b-substitutions.launch.py)
 ```python
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-import launch_ros.actions
+from launch_ros.actions import Node
 from launch.frontend.parse_substitution import parse_substitution
 
 
@@ -345,11 +353,13 @@ def generate_launch_description():
         'circumference': parse_substitution('$(eval 2.*3.1415*$(var radius))'),
     }
 
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument('radius', default_value='1.5'),
         DeclareLaunchArgument('pizza_type', default_value='mushrooms'),
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
-                                parameters=[text_params]),
+        Node(name='does_machines',
+             package='donatello',
+             executable='donatello_node',
+             parameters=[text_params]),
     ])
 ```
 
@@ -358,9 +368,9 @@ def generate_launch_description():
 
 [source](donatello/launch/06c-substitutions.launch.py)
 ```python
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-import launch_ros.actions
+from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterFile
 from launch_ros.substitutions import FindPackageShare
 
@@ -371,11 +381,13 @@ def generate_launch_description():
         allow_substs=True
     )
 
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument('radius', default_value='1.5'),
         DeclareLaunchArgument('pizza_type', default_value='mushrooms'),
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
-                                parameters=[file_parameters]),
+        Node(name='does_machines',
+             package='donatello',
+             executable='donatello_node',
+             parameters=[file_parameters]),
     ])
 ```
 
@@ -398,13 +410,13 @@ In more complex systems, it is often useful to have launch files that include ot
 ### ROS 2
 [source](donatello/launch/07-inclusive.launch.py)
 ```python
-import launch
+from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
+    return LaunchDescription([
         IncludeLaunchDescription([FindPackageShare('donatello'), '/launch/05-arg.launch.py'],
                                  launch_arguments={'pizza_type': 'peppers'}.items()),
     ])
@@ -436,7 +448,7 @@ In this example, we combine the substitution functionality and the ability to in
 ### ROS 2
 [source](donatello/launch/08-conditional.launch.py)
 ```python
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration
@@ -444,7 +456,7 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument('use_number_one', default_value='True'),
         IncludeLaunchDescription(
             [FindPackageShare('donatello'), '/launch/01-single.launch.py'],
@@ -484,20 +496,22 @@ One other way to dynamically change the contents of a launch file by evaluating 
 ### ROS 2
 [source](donatello/launch/09-dynamic-filename.launch.py)
 ```python
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
-import launch_ros.actions
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     dynamic_param_path = [FindPackageShare('donatello'), '/config/', LaunchConfiguration('config'), '.yaml']
 
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument('config', default_value='params'),
-        launch_ros.actions.Node(package='donatello', executable='donatello_node', name='does_machines',
-                                parameters=[dynamic_param_path]),
+        Node(package='donatello',
+             executable='donatello_node',
+             name='does_machines',
+             parameters=[dynamic_param_path]),
     ])
 ```
 
@@ -521,23 +535,25 @@ There are certain scenarios where you want to stop an entire launch file when a 
 ### ROS 2
 [source](donatello/launch/10-required.launch.py)
 ```python
-import launch
-import launch_ros.actions
+from launch import LaunchDescription
+from launch.actions import RegisterEventHandler, LogInfo, EmitEvent, Shutdown
+from launch.event_handlers import OnProcessExit
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    don_node = launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node')
-    five_node = launch_ros.actions.Node(name='five_seconds', package='donatello', executable='five_seconds')
-    handler = launch.actions.RegisterEventHandler(
-        event_handler=launch.event_handlers.OnProcessExit(
+    don_node = Node(name='does_machines', package='donatello', executable='donatello_node')
+    five_node = Node(name='five_seconds', package='donatello', executable='five_seconds')
+    handler = RegisterEventHandler(
+        event_handler=OnProcessExit(
             target_action=five_node,
             on_exit=[
-                launch.actions.LogInfo(
+                LogInfo(
                     msg='Five node exited; tearing down entire system.'),
-                launch.actions.EmitEvent(
-                    event=launch.events.Shutdown())]))
+                EmitEvent(
+                    event=Shutdown())]))
 
-    return launch.LaunchDescription([don_node, five_node, handler])
+    return LaunchDescription([don_node, five_node, handler])
 ```
  * Thanks to [The Ubuntu Blog](https://ubuntu.com/blog/ros2-launch-required-nodes) for their useful example.
  * Like so many things in ROS 2, the process for making a node required is more complicated, but also more flexible.
