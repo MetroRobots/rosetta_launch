@@ -540,7 +540,26 @@ There are certain scenarios where you want to stop an entire launch file when a 
  * Because it is marked as `required`, the other nodes in the launch file (`cool_but_rude`) will also be terminated after five seconds.
 
 ### ROS 2
-[source](donatello/launch/10-required.launch.py)
+The ROS 2 launch system adds a bit of flexibility to what to do when a node is shutdown.
+
+If you just want to replicate the behavior, you can add `on_exit=Shutdown()` to the Node.
+
+[source](donatello/launch/10a-required.launch.py)
+```python
+from launch import LaunchDescription
+from launch.actions import Shutdown
+from launch_ros.actions import Node
+
+
+def generate_launch_description():
+    don_node = Node(name='does_machines', package='donatello', executable='donatello_node')
+    five_node = Node(name='five_seconds', package='donatello', executable='five_seconds', on_exit=Shutdown())
+    return LaunchDescription([don_node, five_node])
+```
+
+However, you can also get much more complex, and get the event handling to do things other than just shutting down.
+
+[source](donatello/launch/10b-required.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import RegisterEventHandler, LogInfo, EmitEvent, Shutdown
@@ -562,9 +581,7 @@ def generate_launch_description():
 
     return LaunchDescription([don_node, five_node, handler])
 ```
- * Thanks to [The Ubuntu Blog](https://ubuntu.com/blog/ros2-launch-required-nodes) for their useful example.
- * Like so many things in ROS 2, the process for making a node required is more complicated, but also more flexible.
-
+ * Thanks to [Alex Moriarty](https://github.com/moriarty) for pointing me to the first method and [The Ubuntu Blog](https://ubuntu.com/blog/ros2-launch-required-nodes) for the second.
 
 ## 11 - Launch from Code
 If you want to start a launch file from a script, you can sometimes use the `subprocess` Python library, but that can lead to problems with the paths. This is how you can launch a launch file in the ROS-y way.
