@@ -1,7 +1,7 @@
 pizza: pepperoni
 brothers: [leo, don, mike]
 coworkers:
-    - leo
-    - don
-    - mike
+- leo
+- don
+- mike
 weapon: sai

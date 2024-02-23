@@ -16,18 +16,43 @@ repos:
   - id: requirements-txt-fixer
   - id: check-xml
   - id: check-yaml
-  rev: v4.4.0
+  rev: v4.5.0
 - repo: https://github.com/codespell-project/codespell
   hooks:
   - id: codespell
     args:
     - --write-changes
-  rev: v2.2.2
-- repo: https://github.com/pre-commit/mirrors-autopep8
+  rev: v2.2.6
+- repo: https://github.com/hhatto/autopep8
   hooks:
   - id: autopep8
-  rev: v2.0.0
+  rev: v2.0.4
 - repo: https://github.com/PyCQA/flake8
   hooks:
   - id: flake8
-  rev: 6.0.0
+  rev: 6.1.0
+- repo: https://github.com/adrienverge/yamllint
+  hooks:
+  - id: yamllint
+    args:
+    - --format
+    - parsable
+    - --strict
+  rev: v1.33.0
+- repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+  hooks:
+  - id: yamlfmt
+    args:
+    - --width
+    - '120'
+    - --implicit_start
+    - --implicit_end
+    - --mapping
+    - '2'
+    - --sequence
+    - '2'
+    - --offset
+    - '0'
+  rev: 0.2.3
+ci:
+  autoupdate_schedule: quarterly

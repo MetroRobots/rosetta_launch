@@ -1,6 +1,6 @@
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-import launch_ros.actions
+from launch_ros.actions import Node
 from launch.frontend.parse_substitution import parse_substitution
 
 
@@ -17,9 +17,11 @@ def generate_launch_description():
         'circumference': parse_substitution('$(eval 2.*3.1415*$(var radius))'),
     }
 
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument('radius', default_value='1.5'),
         DeclareLaunchArgument('pizza_type', default_value='mushrooms'),
-        launch_ros.actions.Node(name='does_machines', package='donatello', executable='donatello_node',
-                                parameters=[text_params]),
+        Node(name='does_machines',
+             package='donatello',
+             executable='donatello_node',
+             parameters=[text_params]),
     ])
