@@ -631,24 +631,22 @@ if __name__ == '__main__':
     main()
 ```
 
-
-
-## 11 - Recursion
+## 12 - Recursion
 As suggested by [Martin Pecka](https://discourse.ros.org/t/rosetta-launch-everything-i-know-about-ros-1-and-ros-2-launch-files/29648/5). This example will enable you to launch 10 of the same node.
 
 ### ROS 1
-[source](raphael/launch/11-recursion.launch)
+[source](raphael/launch/12-recursion.launch)
 ```xml
 <launch>
     <arg name="N" default="10" />
     <node name="raphael_node$(arg N)" pkg="raphael" type="raphael_node" />
-    <include file="$(find raphael)/launch/11-recursion.launch" if="$(eval N > 0)">
+    <include file="$(find raphael)/launch/12-recursion.launch" if="$(eval N > 1)">
         <arg name="N" value="$(eval N - 1)" />
     </include>
 </launch>
 ```
 ### ROS 2
-[source](donatello/launch/11-recursion.launch.py)
+[source](donatello/launch/12-recursion.launch.py)
 ```python
 from ament_index_python.packages import get_package_share_path
 import launch
@@ -663,8 +661,8 @@ def generate_launch_description():
         DeclareLaunchArgument('N', default_value='10'),
         launch_ros.actions.Node(name=['donatello_node', LaunchConfiguration('N')],
                                 package='donatello', executable='donatello_node'),
-        IncludeLaunchDescription(str(get_package_share_path('donatello') / 'launch/11-recursion.launch.py'),
-                                 condition=IfCondition(PythonExpression([LaunchConfiguration('N'), '>0'])),
+        IncludeLaunchDescription(str(get_package_share_path('donatello') / 'launch/12-recursion.launch.py'),
+                                 condition=IfCondition(PythonExpression([LaunchConfiguration('N'), '>1'])),
                                  launch_arguments={'N': PythonExpression([LaunchConfiguration('N'), '-1'])}.items()),
     ])
 ```
