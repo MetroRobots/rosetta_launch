@@ -26,11 +26,11 @@ repos:
 - repo: https://github.com/hhatto/autopep8
   hooks:
   - id: autopep8
-  rev: v2.0.4
+  rev: v2.1.0
 - repo: https://github.com/PyCQA/flake8
   hooks:
   - id: flake8
-  rev: 6.1.0
+  rev: 7.0.0
 - repo: https://github.com/adrienverge/yamllint
   hooks:
   - id: yamllint
@@ -38,7 +38,7 @@ repos:
     - --format
     - parsable
     - --strict
-  rev: v1.33.0
+  rev: v1.35.1
 - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
   hooks:
   - id: yamlfmt
