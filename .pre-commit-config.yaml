@@ -30,7 +30,7 @@ repos:
 - repo: https://github.com/PyCQA/flake8
   hooks:
   - id: flake8
-  rev: 7.2.0
+  rev: 7.3.0
 - repo: https://github.com/adrienverge/yamllint
   hooks:
   - id: yamllint
@@ -38,7 +38,7 @@ repos:
     - --format
     - parsable
     - --strict
-  rev: v1.37.0
+  rev: v1.37.1
 - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
   hooks:
   - id: yamlfmt
