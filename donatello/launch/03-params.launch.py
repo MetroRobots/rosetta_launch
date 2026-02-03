@@ -9,5 +9,5 @@ def generate_launch_description():
         Node(name='does_machines',
              package='donatello',
              executable='donatello_node',
-             parameters=[PathJoinSubstitution(FindPackageShare('donatello'), 'config', 'params.yaml')]),
+             parameters=[PathJoinSubstitution([FindPackageShare('donatello'), 'config', 'params.yaml'])]),
     ])

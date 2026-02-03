@@ -8,7 +8,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     file_parameters = ParameterFile(
-        param_file=PathJoinSubstitution(FindPackageShare('donatello'), 'config', 'sub_params.yaml'),
+        param_file=PathJoinSubstitution([FindPackageShare('donatello'), 'config', 'sub_params.yaml']),
         allow_substs=True
     )
 

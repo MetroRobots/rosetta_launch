@@ -132,7 +132,7 @@ def generate_launch_description():
         Node(name='does_machines',
              package='donatello',
              executable='donatello_node',
-             parameters=[PathJoinSubstitution(FindPackageShare('donatello'), 'config', 'params.yaml')]),
+             parameters=[PathJoinSubstitution([FindPackageShare('donatello'), 'config', 'params.yaml'])]),
     ])
 ```
 
@@ -180,7 +180,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     robot_description = ParameterValue(
-        Command(['xacro ', PathJoinSubstitution(FindPackageShare('urdf_tutorial'), 'urdf', '01-myfirst.urdf')]),
+        Command(['xacro ', PathJoinSubstitution([FindPackageShare('urdf_tutorial'), 'urdf', '01-myfirst.urdf'])]),
         value_type=str)
 
     return LaunchDescription([
@@ -379,7 +379,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     file_parameters = ParameterFile(
-        param_file=PathJoinSubstitution(FindPackageShare('donatello'), 'config', 'sub_params.yaml'),
+        param_file=PathJoinSubstitution([FindPackageShare('donatello'), 'config', 'sub_params.yaml']),
         allow_substs=True
     )
 
@@ -420,7 +420,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     return LaunchDescription([
-        IncludeLaunchDescription(PathJoinSubstitution(FindPackageShare('donatello'), 'launch', '05-arg.launch.py'),
+        IncludeLaunchDescription(PathJoinSubstitution([FindPackageShare('donatello'), 'launch', '05-arg.launch.py']),
                                  launch_arguments={'pizza_type': 'peppers'}.items()),
     ])
 ```
@@ -462,11 +462,11 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('use_number_one', default_value='True'),
         IncludeLaunchDescription(
-            PathJoinSubstitution(FindPackageShare('donatello'), 'launch', '01-single.launch.py'),
+            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', '01-single.launch.py']),
             condition=IfCondition(LaunchConfiguration('use_number_one')),
         ),
         IncludeLaunchDescription(
-            PathJoinSubstitution(FindPackageShare('donatello'), 'launch', '02-param.launch.py'),
+            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', '02-param.launch.py']),
             condition=UnlessCondition(LaunchConfiguration('use_number_one')),
         ),
     ])
@@ -507,11 +507,11 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    dynamic_param_path = PathJoinSubstitution(
+    dynamic_param_path = PathJoinSubstitution([
         FindPackageShare('donatello'),
         'config',
         [LaunchConfiguration('config'), '.yaml']
-    )
+    ])
 
     return LaunchDescription([
         DeclareLaunchArgument('config', default_value='params'),

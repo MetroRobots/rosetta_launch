@@ -9,11 +9,11 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('use_number_one', default_value='True'),
         IncludeLaunchDescription(
-            PathJoinSubstitution(FindPackageShare('donatello'), 'launch', '01-single.launch.py'),
+            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', '01-single.launch.py']),
             condition=IfCondition(LaunchConfiguration('use_number_one')),
         ),
         IncludeLaunchDescription(
-            PathJoinSubstitution(FindPackageShare('donatello'), 'launch', '02-param.launch.py'),
+            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', '02-param.launch.py']),
             condition=UnlessCondition(LaunchConfiguration('use_number_one')),
         ),
     ])

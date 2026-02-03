@@ -7,7 +7,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     robot_description = ParameterValue(
-        Command(['xacro ', PathJoinSubstitution(FindPackageShare('urdf_tutorial'), 'urdf', '01-myfirst.urdf')]),
+        Command(['xacro ', PathJoinSubstitution([FindPackageShare('urdf_tutorial'), 'urdf', '01-myfirst.urdf'])]),
         value_type=str)
 
     return LaunchDescription([
