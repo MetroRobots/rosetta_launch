@@ -22,7 +22,7 @@ repos:
   - id: codespell
     args:
     - --write-changes
-  rev: v2.4.1
+  rev: v2.4.2
 - repo: https://github.com/hhatto/autopep8
   hooks:
   - id: autopep8
@@ -38,7 +38,7 @@ repos:
     - --format
     - parsable
     - --strict
-  rev: v1.37.1
+  rev: v1.38.0
 - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
   hooks:
   - id: yamlfmt
