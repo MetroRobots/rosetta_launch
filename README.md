@@ -631,7 +631,7 @@ if __name__ == '__main__':
     main()
 ```
 
-## 12 - Recursion
+## 12 - Repetition
 As suggested by [Martin Pecka](https://discourse.ros.org/t/rosetta-launch-everything-i-know-about-ros-1-and-ros-2-launch-files/29648/5). This example will enable you to launch 10 of the same node.
 
 ### ROS 1
@@ -645,27 +645,34 @@ As suggested by [Martin Pecka](https://discourse.ros.org/t/rosetta-launch-everyt
     </include>
 </launch>
 ```
+
+In ROS 1, the iteration had to be done recursively.
+
 ### ROS 2
-[source](donatello/launch/12-recursion.launch.py)
+[source](donatello/launch/12-repetition.launch.py)
 ```python
-from ament_index_python.packages import get_package_share_path
 import launch
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
-from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.actions import DeclareLaunchArgument, ForLoop
+from launch.substitutions import LaunchConfiguration
 import launch_ros.actions
+
+
+def single_node(i: int):
+    return [
+        # i will be [0, N), so use i+1 to get [1, N]
+        launch_ros.actions.Node(name=['donatello_node', str(i + 1)],
+                                package='donatello', executable='donatello_node'),
+    ]
 
 
 def generate_launch_description():
     return launch.LaunchDescription([
         DeclareLaunchArgument('N', default_value='10'),
-        launch_ros.actions.Node(name=['donatello_node', LaunchConfiguration('N')],
-                                package='donatello', executable='donatello_node'),
-        IncludeLaunchDescription(str(get_package_share_path('donatello') / 'launch/12-recursion.launch.py'),
-                                 condition=IfCondition(PythonExpression([LaunchConfiguration('N'), '>1'])),
-                                 launch_arguments={'N': PythonExpression([LaunchConfiguration('N'), '-1'])}.items()),
+        ForLoop(LaunchConfiguration('N'), function=single_node),
     ])
 ```
+
+This takes the output of the function `single_node` and repeats it `N` times.
 
 # Other Links
  * ROS 1
