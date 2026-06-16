@@ -16,7 +16,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='David V. Lu!!',
-    maintainer_email='davidvlu@gmail.com',
+    maintainer_email='david@metrorobots.com',
     description='ROS 2 Launch example code for rosetta_launch',
     license='BSD',
     tests_require=['pytest'],
