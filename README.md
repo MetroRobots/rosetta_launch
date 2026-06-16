@@ -24,7 +24,7 @@ Three things are required for the minimal example:
 
 ### ROS 2
 
-[source](donatello/launch/01-single.launch.py)
+[source](donatello/launch/python/01-single.launch.py)
 ```python
 from launch import LaunchDescription
 from launch_ros.actions import Node
@@ -80,7 +80,7 @@ If we want to specify an exact value for a ROS parameter inside of the launch fi
  * The contents of a `rosparam` xml element can also be interpreted as yaml. You can specify the name as an attribute (e.g. `coworkers`) or specify a whole dictionary of names and values (e.g. `weapon`)
 
 ### ROS 2
-[source](donatello/launch/02-param.launch.py)
+[source](donatello/launch/python/02-param.launch.py)
 ```python
 from launch import LaunchDescription
 from launch_ros.actions import Node
@@ -119,7 +119,7 @@ To load parameters from a file, we need the full path to the yaml file.
 
 
 ### ROS 2
-[source](donatello/launch/03-params.launch.py)
+[source](donatello/launch/python/03-params.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.substitutions import PathJoinSubstitution
@@ -169,7 +169,7 @@ Sometimes you will want to set parameters based on the results of running a comm
 ```
 
 ### ROS 2
-[source](donatello/launch/04-command-params.launch.py)
+[source](donatello/launch/python/04-command-params.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.substitutions import Command, PathJoinSubstitution
@@ -222,7 +222,7 @@ There are two different steps for using command line arguments:
    ```
 
 ### ROS 2
-[source](donatello/launch/05-arg.launch.py)
+[source](donatello/launch/python/05-arg.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -296,7 +296,7 @@ In the previous example, we were able to dynamically change our launch file by u
 ### ROS 2
 There are multiple ways to do substitutions in ROS 2 Python launch files.
 
-[source](donatello/launch/06a-substitutions.launch.py)
+[source](donatello/launch/python/06a-substitutions.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -333,7 +333,7 @@ def generate_launch_description():
    * The parameter value is a list containing one string and one substitution. The `EnvironmentVariable` is evaluated, resulting in the list now being `['ROS ', 2]`, which are then combined so the final value is `'ROS 2'`
  * The same principles apply to the substitution within a substitution in `circumference`.
 
-[source](donatello/launch/06b-substitutions.launch.py)
+[source](donatello/launch/python/06b-substitutions.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -367,7 +367,7 @@ def generate_launch_description():
  * You can also use the dollar substitution syntax as in ROS 1.
  * Using the `parse_substitution` method will result in lists and objects as in the previous example.
 
-[source](donatello/launch/06c-substitutions.launch.py)
+[source](donatello/launch/python/06c-substitutions.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -410,7 +410,7 @@ In more complex systems, it is often useful to have launch files that include ot
 </launch>
 ```
 ### ROS 2
-[source](donatello/launch/07-inclusive.launch.py)
+[source](donatello/launch/python/07-inclusive.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
@@ -420,8 +420,10 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     return LaunchDescription([
-        IncludeLaunchDescription(PathJoinSubstitution([FindPackageShare('donatello'), 'launch', '05-arg.launch.py']),
-                                 launch_arguments={'pizza_type': 'peppers'}.items()),
+        IncludeLaunchDescription(
+            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', 'python', '05-arg.launch.py']),
+            launch_arguments={'pizza_type': 'peppers'}.items()
+        ),
     ])
 ```
 
@@ -449,7 +451,7 @@ In this example, we combine the substitution functionality and the ability to in
  * `if/unless` can be used on individual nodes as well.
 
 ### ROS 2
-[source](donatello/launch/08-conditional.launch.py)
+[source](donatello/launch/python/08-conditional.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
@@ -462,11 +464,11 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('use_number_one', default_value='True'),
         IncludeLaunchDescription(
-            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', '01-single.launch.py']),
+            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', 'python', '01-single.launch.py']),
             condition=IfCondition(LaunchConfiguration('use_number_one')),
         ),
         IncludeLaunchDescription(
-            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', '02-param.launch.py']),
+            PathJoinSubstitution([FindPackageShare('donatello'), 'launch', 'python', '02-param.launch.py']),
             condition=UnlessCondition(LaunchConfiguration('use_number_one')),
         ),
     ])
@@ -497,7 +499,7 @@ One other way to dynamically change the contents of a launch file by evaluating 
  * This method can also be used for changing the filename of an included launch file.
 
 ### ROS 2
-[source](donatello/launch/09-dynamic-filename.launch.py)
+[source](donatello/launch/python/09-dynamic-filename.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -544,7 +546,7 @@ The ROS 2 launch system adds a bit of flexibility to what to do when a node is s
 
 If you just want to replicate the behavior, you can add `on_exit=Shutdown()` to the Node.
 
-[source](donatello/launch/10a-required.launch.py)
+[source](donatello/launch/python/10a-required.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import Shutdown
@@ -559,7 +561,7 @@ def generate_launch_description():
 
 However, you can also get much more complex, and get the event handling to do things other than just shutting down.
 
-[source](donatello/launch/10b-required.launch.py)
+[source](donatello/launch/python/10b-required.launch.py)
 ```python
 from launch import LaunchDescription
 from launch.actions import RegisterEventHandler, LogInfo, EmitEvent, Shutdown
@@ -649,7 +651,7 @@ As suggested by [Martin Pecka](https://discourse.ros.org/t/rosetta-launch-everyt
 In ROS 1, the iteration had to be done recursively.
 
 ### ROS 2
-[source](donatello/launch/12-repetition.launch.py)
+[source](donatello/launch/python/12-repetition.launch.py)
 ```python
 import launch
 from launch.actions import DeclareLaunchArgument, ForLoop
