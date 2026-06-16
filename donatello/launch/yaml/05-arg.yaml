@@ -1,0 +1,11 @@
+launch:
+- arg:
+    name: pizza_type
+    default: mushrooms
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - name: pizza
+      value: $(var pizza_type)

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <include file="$(find-pkg-share donatello)/launch/xml/05-arg.xml">
+    <let name="pizza_type" value="peppers"/>
+  </include>
+</launch>

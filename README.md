@@ -7,6 +7,13 @@ This repository contains two packages, named after adolescent genetic variants o
 
 Donatello is more technically advanced, but is sometimes harder to understand.
 
+The launch files in `donatello` are done three different ways:
+ * Python
+ * XML
+ * YAML
+
+The Python code is running behind the XML and YAML versions.
+
 ## 01 - Launch a Single Node
 Three things are required for the minimal example:
  * Name - Used for node name, regardless of executable name
@@ -23,6 +30,8 @@ Three things are required for the minimal example:
 ```
 
 ### ROS 2
+
+#### Python
 
 [source](donatello/launch/python/01-single.launch.py)
 ```python
@@ -52,6 +61,38 @@ There are actually several different "styles" for adding nodes to a launch descr
     return ld
     ```
 
+#### XML
+[source](donatello/launch/xml/01-single.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <node pkg="donatello" exec="donatello_node" name="does_machines"/>
+</launch>
+```
+
+This is very similar to the ROS 1 XML launch format (order of xml attributes does not matter), with the primary difference being the attribute used for which executable to use with the package has changed from `type` to `exec`.
+
+Also note that in the ROS 2 examples we include the XML prolog (the `<?xml` line) for clean encoding.
+
+<launch>
+    <node name="cool_but_rude" pkg="raphael" type="raphael_node" />
+</launch>
+
+
+#### YAML
+[source](donatello/launch/yaml/01-single.yaml)
+```yaml
+launch:
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+```
+
+The keys of the YAML dictionaries in launch files all match the XML node names and attributes, just with a few differences in formatting.
+
+YAML is often the most compact launch representation. In this first example, the YAML has 84 bytes, the XML has 127 bytes and the Python is 234 bytes.
+
 
 ## 02 - Set a parameter directly
 If we want to specify an exact value for a ROS parameter inside of the launch file, we need the parameter name and the parameter value.
@@ -80,6 +121,7 @@ If we want to specify an exact value for a ROS parameter inside of the launch fi
  * The contents of a `rosparam` xml element can also be interpreted as yaml. You can specify the name as an attribute (e.g. `coworkers`) or specify a whole dictionary of names and values (e.g. `weapon`)
 
 ### ROS 2
+#### Python
 [source](donatello/launch/python/02-param.launch.py)
 ```python
 from launch import LaunchDescription
@@ -101,6 +143,46 @@ def generate_launch_description():
  * To specify the values directly, we put them in a dictionary within the Python list.
  * Since the parameters are within Python code, the type is determined by their Python type.
 
+#### XML
+[source](donatello/launch/xml/02-param.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <set_parameter name="use_sim_time" value="true"/>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param name="pizza" value="mushrooms"/>
+    <param name="brothers" value="[leo, mike, raph]"/>
+  </node>
+</launch>
+```
+
+ * You can set global parameters in ROS 2 using the `set_parameter` tag in the root of the launch file, although this should be used sparingly.
+ * You specify parameters within the node tag with the param tag, each having its own `name` and `value`
+ * The type of the parameter is automatically inferred based on YAML syntax
+
+#### YAML
+[source](donatello/launch/yaml/02-param.yaml)
+```yaml
+launch:
+- set_parameter:
+    name: use_sim_time
+    value: 'true'
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - name: pizza
+      value: mushrooms
+    - name: brothers
+      value: [leo, mike, raph]
+```
+
+ * You can set global parameters in ROS 2 using a `set_parameter` dictionary, although this should be used sparingly.
+ * The value of the `set_parameter` must be a string, even though in this case it represents a boolean value.
+ * You specify the parameters by using the `param` key in the `node` dictionary.
+ * The value is a list of dictionaries, each having a `name` and `value`.
+
 
 ## 03 - Load Parameters from YAML file
 
@@ -120,6 +202,7 @@ To load parameters from a file, we need the full path to the yaml file.
 
 
 ### ROS 2
+#### Python
 [source](donatello/launch/python/03-params.launch.py)
 ```python
 from launch import LaunchDescription
@@ -157,6 +240,36 @@ def generate_launch_description():
 * While the latter two ways of specifying the path are common, if you are combining with other substitutions, the first option is the easiest to work with.
 
 
+#### XML
+[source](donatello/launch/xml/03-params.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param from="$(find-pkg-share donatello)/config/params.yaml"/>
+  </node>
+</launch>
+```
+ * To load parameters from a file, we still use the `param` tag, but now we set the `from` attribute (instead of `name/value`)
+ * The value of the `from` attribute is a substitution (which we'll discuss more below) which combines the donatello package's share path (`$(find-pkg-share donatello)`) with the path to the file within the package.
+
+
+#### YAML
+[source](donatello/launch/yaml/03-params.yaml)
+```yaml
+launch:
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - from: $(find-pkg-share donatello)/config/params.yaml
+```
+
+ * To load parameters from a file, we still use an array under the `param` key, but now the dictionary just has a `from` key (instead of `name/value`)
+ * The value of used with the `from` key  is a substitution (which we'll discuss more below) which combines the donatello package's share path (`$(find-pkg-share donatello)`) with the path to the file within the package.
+
+
 ## 04 - Load Parameters from a Command
 Sometimes you will want to set parameters based on the results of running a command. This is very commonly seen when running `xacro` on your robot model and loading it in as a parameter.
 
@@ -170,6 +283,7 @@ Sometimes you will want to set parameters based on the results of running a comm
 ```
 
 ### ROS 2
+#### Python
 [source](donatello/launch/python/04-command-params.launch.py)
 ```python
 from launch import LaunchDescription
@@ -192,6 +306,34 @@ def generate_launch_description():
 ```
 
  * Note: In many cases, you can get away with not wrapping the `Command` in a `ParameterValue` object, but then the launch system will try to guess the value type, and if there happens to be a colon (`:`) in a string you're trying to load, [it will try to interpret it as YAML](https://github.com/ros2/launch_ros/issues/214)
+
+#### XML
+[source](donatello/launch/xml/04-command-params.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <node pkg="robot_state_publisher" exec="robot_state_publisher">
+    <param name="robot_description" value="$(command 'xacro $(find-pkg-share urdf_tutorial)/urdf/01-myfirst.urdf')"/>
+  </node>
+</launch>
+```
+
+The syntax here sets the value of the `robot_description` parameter to be a two-layered substitution. First, we find the URDF file with the `find-pkg-share` substitution, and then that is passed to the `command` substitution, which runs the xacro command.
+
+
+#### YAML
+[source](donatello/launch/yaml/04-command-params.yaml)
+```yaml
+launch:
+- node:
+    pkg: robot_state_publisher
+    exec: robot_state_publisher
+    param:
+    - name: robot_description
+      value: $(command "xacro $(find-pkg-share urdf_tutorial)/urdf/01-myfirst.urdf")
+```
+
+The syntax here sets the value of the `robot_description` parameter to be a two-layered substitution. First, we find the URDF file with the `find-pkg-share` substitution, and then that is passed to the `command` substitution, which runs the xacro command.
 
 ## 05 - Set a Command Line Argument
 There are two different steps for using command line arguments:
@@ -223,6 +365,7 @@ There are two different steps for using command line arguments:
    ```
 
 ### ROS 2
+#### Python
 [source](donatello/launch/python/05-arg.launch.py)
 ```python
 from launch import LaunchDescription
@@ -248,8 +391,51 @@ def generate_launch_description():
    ros2 launch donatello 05-arg.launch.py pizza_type:=meatball
    ```
 
+#### XML
+[source](donatello/launch/xml/05-arg.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="pizza_type" default="mushrooms"/>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param name="pizza" value="$(var pizza_type)"/>
+  </node>
+</launch>
+```
+
+ * The argument is declared using the `arg` tag, with a name and optionally a default value.
+ * The value can be used with the `($var ...)` substitution.
+ * You can specify the value you want on the command line the same way as ROS 1, i.e.
+   ```bash
+   ros2 launch donatello 05-arg.xml pizza_type:=meatball
+   ```
+
+#### YAML
+[source](donatello/launch/yaml/05-arg.yaml)
+```yaml
+launch:
+- arg:
+    name: pizza_type
+    default: mushrooms
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - name: pizza
+      value: $(var pizza_type)
+```
+
+ * The argument is declared using a dictionary with `arg` as the key, with a name and optionally a default value.
+ * The value can be used with the `($var ...)` substitution.
+ * You can specify the value you want on the command line the same way as ROS 1, i.e.
+   ```bash
+   ros2 launch donatello 05-arg.yaml pizza_type:=meatball
+   ```
+
+
 ## 06 - Using Substitutions Everywhere
-In the previous example, we were able to dynamically change our launch file by using substitutions, i.e. dynamically replacing the value of a variable. We also used `FindPackageShare` to dynamically find the path to a file. There are actually a lot of different things you can substitute in.
+In the previous example(s), we were able to dynamically change our launch file by using substitutions, i.e. dynamically replacing the value of a variable. We also used `FindPackageShare` to dynamically find the path to a file. There are actually a lot of different things you can substitute in.
 
 | Name                          | ROS 1 command | ROS 2 command          | ROS2 Object         | Note |
 |-------------------------------|---------------|------------------------|---------------------|------|
@@ -297,6 +483,8 @@ In the previous example, we were able to dynamically change our launch file by u
 ### ROS 2
 There are multiple ways to do substitutions in ROS 2 Python launch files.
 
+#### Python Objects
+
 [source](donatello/launch/python/06a-substitutions.launch.py)
 ```python
 from launch import LaunchDescription
@@ -334,6 +522,8 @@ def generate_launch_description():
    * The parameter value is a list containing one string and one substitution. The `EnvironmentVariable` is evaluated, resulting in the list now being `['ROS ', 2]`, which are then combined so the final value is `'ROS 2'`
  * The same principles apply to the substitution within a substitution in `circumference`.
 
+#### Python String Substitutions
+
 [source](donatello/launch/python/06b-substitutions.launch.py)
 ```python
 from launch import LaunchDescription
@@ -369,6 +559,8 @@ def generate_launch_description():
  * Using the `parse_substitution` method will result in lists and objects as in the previous example.
  * Note that the command in the `command` substitution must be surrounded with quotes when it has multiple tokens.
 
+#### Python File Substitutions
+
 [source](donatello/launch/python/06c-substitutions.launch.py)
 ```python
 from launch import LaunchDescription
@@ -400,6 +592,121 @@ def generate_launch_description():
  * Note that the command in the `command` substitution in the parameter file must be surrounded with quotes when it has multiple tokens.
  * The way that substitutions are performed in the parameter file is very naive, and it is possible to insert invalid YAML into the parameter file, i.e. if the output of a `command` contains colons or newlines. This will result in an error stating `The substituted parameter file is not a valid yaml file`.
 
+#### XML String Substitutions
+[source](donatello/launch/xml/06a-substitutions.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="pizza_type" default="mushrooms"/>
+  <arg name="radius" default="1.5"/>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param name="pizza" value="$(var pizza_type)"/>
+    <param name="anonymous_name" value="$(anon leo)"/>
+    <param name="favorite_brother" value="$(env BROTHER_NAME mikey)"/>
+    <param name="filename" value="$(filename)"/>
+    <param name="directory" value="$(dirname)"/>
+    <param name="release_exec" value="$(find-exec lsb_release)"/>
+    <param name="release_output" value="$(command 'lsb_release -ds')"/>
+    <param name="version" value="ROS $(env ROS_VERSION)"/>
+    <param name="circumference" value="$(eval 2.*3.1415*$(var radius))"/>
+  </node>
+</launch>
+```
+
+ * In this example, we use the dollar-sign substitutions directly in the value attributes, as in previous examples.
+ * Note that the command in the `command` substitution must be surrounded with quotes when it has multiple tokens.
+ * Note how the substitutions can be combined with regular strings. For example, look at `version` above. The substitution `$(env ROS_VERSION)` is replaced with the string `'2'`, and then combined with the rest of the string so the final value is `'ROS 2'`
+ * As with `command` in a previous example, the substitutions can be nested, as with `circumference`, where the `var` is substituted and used in the `eval`.
+
+
+#### XML File Substitutions
+
+[source](donatello/launch/xml/06c-substitutions.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="pizza_type" default="mushrooms"/>
+  <arg name="radius" default="1.5"/>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param from="$(find-pkg-share donatello)/config/sub_params.yaml" allow_substs="true"/>
+  </node>
+</launch>
+```
+
+[parameter file source](donatello/config/sub_params.yaml)
+
+ * If you set parameters from a YAML file using the `param` tag, you can also do substitutions in the YAML file, as long as you set `allow_substs="true"`.
+ * Note that the command in the `command` substitution in the parameter file must be surrounded with quotes when it has multiple tokens.
+ * The way that substitutions are performed in the parameter file is very naive, and it is possible to insert invalid YAML into the parameter file, i.e. if the output of a `command` contains colons or newlines. This will result in an error stating `The substituted parameter file is not a valid yaml file`.
+
+
+#### YAML String Substitutions
+
+[source](donatello/launch/yaml/06a-substitutions.yaml)
+```yaml
+launch:
+- arg:
+    name: pizza_type
+    default: mushrooms
+- arg:
+    name: radius
+    default: '1.5'
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - name: pizza
+      value: $(var pizza_type)
+    - name: anonymous_name
+      value: $(anon leo)
+    - name: favorite_brother
+      value: $(env BROTHER_NAME mikey)
+    - name: filename
+      value: $(filename)
+    - name: directory
+      value: $(dirname)
+    - name: release_exec
+      value: $(find-exec lsb_release)
+    - name: release_output
+      value: $(command lsb_release)
+    - name: version
+      value: ROS $(env ROS_VERSION)
+    - name: circumference
+      value: $(eval 2.*3.1415*$(var radius))
+```
+
+ * In this example, we use the dollar-sign substitutions directly in the value, as in previous examples.
+ * Note how the substitutions can be combined with regular strings. For example, look at `version` above. The substitution `$(env ROS_VERSION)` is replaced with the string `'2'`, and then combined with the rest of the string so the final value is `'ROS 2'`
+ * As with `command` in a previous example, the substitutions can be nested, as with `circumference`, where the `var` is substituted and used in the `eval`.
+ * Note that the command in the `command` substitution in the parameter file must be surrounded with quotes when it has multiple tokens.
+ * The way that substitutions are performed in the parameter file is very naive, and it is possible to insert invalid YAML into the parameter file, i.e. if the output of a `command` contains colons or newlines. This will result in an error stating `The substituted parameter file is not a valid yaml file`.
+
+#### YAML File Substitutions
+
+[source](donatello/launch/yaml/06c-substitutions.yaml)
+```yaml
+launch:
+- arg:
+    name: pizza_type
+    default: mushrooms
+- arg:
+    name: radius
+    default: '1.5'
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - from: $(find-pkg-share donatello)/config/sub_params.yaml
+      allow_substs: true
+```
+
+[parameter file source](donatello/config/sub_params.yaml)
+
+If you set parameters from an external YAML file using the `param` key, you can also do substitutions in the YAML file, as long as you set `allow_substs: true`.
+
+
 ## 07 - Include Another Launch
 
 In more complex systems, it is often useful to have launch files that include other launch files, often including specific values for the launch arguments.
@@ -414,6 +721,7 @@ In more complex systems, it is often useful to have launch files that include ot
 </launch>
 ```
 ### ROS 2
+#### Python
 [source](donatello/launch/python/07-inclusive.launch.py)
 ```python
 from launch import LaunchDescription
@@ -433,6 +741,36 @@ def generate_launch_description():
 
  * The first argument to the `IncludeLaunchDescription` object in this case is a string representing the path to the launch file to include, which automatically gets converted to a [`launch.launch_description_source.PythonLaunchDescriptionSource`](https://github.com/ros2/launch/blob/b129eb65c9f03980c724b17200236290fa797816/launch/launch/launch_description_sources/python_launch_description_source.py) class, which is a subclass of [`launch.LaunchDescriptionSource`](https://github.com/ros2/launch/blob/b129eb65c9f03980c724b17200236290fa797816/launch/launch/launch_description_source.py#L30)
  * There are cases where you would want to construct the `PythonLaunchDescriptionSource` explicitly, or include a different type of `LaunchDescriptionSource`, but for now the string with the full path to the Python is the most straightforward option.
+
+#### XML
+[source](donatello/launch/xml/07-inclusive.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <include file="$(find-pkg-share donatello)/launch/xml/05-arg.xml">
+    <let name="pizza_type" value="peppers"/>
+  </include>
+</launch>
+```
+
+ * To include another launch file, we use the `<include>` tag with the `file` attribute set.
+ * We can set launch arguments for the included launch file by using the `<let>` tag with `name/value` attributes.
+
+
+#### YAML
+[source](donatello/launch/yaml/07-inclusive.yaml)
+```yaml
+launch:
+- include:
+    file: $(find-pkg-share donatello)/launch/yaml/05-arg.yaml
+    let:
+    - name: pizza_type
+      value: peppers
+```
+
+ * To include another launch file, we use the `include` key set to a dictionary with `file` as a key.
+ * We can set launch arguments for the included launch file by setting a list of `name/value` dictionaries to the key `let`.
+
 
 ## 08 - Conditionally Include
 In this example, we combine the substitution functionality and the ability to include another launch file from the last two examples to evaluate an argument to determine which launch file to include. We're going to include both cases, i.e. including if the argument is true and if the argument is false, but you can do just one.
@@ -455,6 +793,7 @@ In this example, we combine the substitution functionality and the ability to in
  * `if/unless` can be used on individual nodes as well.
 
 ### ROS 2
+#### Python
 [source](donatello/launch/python/08-conditional.launch.py)
 ```python
 from launch import LaunchDescription
@@ -484,6 +823,42 @@ def generate_launch_description():
  * The `condition` parameter can be used on a wide array of Python launch objects, including individual nodes.
 
 
+#### XML
+[source](donatello/launch/xml/08-conditional.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="use_number_one" default="true"/>
+  <include file="$(find-pkg-share donatello)/launch/xml/01-single.xml" if="$(var use_number_one)"/>
+  <include file="$(find-pkg-share donatello)/launch/xml/02-param.xml" unless="$(var use_number_one)"/>
+</launch>
+```
+ * Same behaviors as in ROS 1:
+   * `ros2 launch donatello 08-conditional.launch.py`
+   * `ros2 launch donatello 08-conditional.launch.py use_number_one:=False`
+ * We can add the `if/unless` attributes to a variety of launch tags, including `<include>` and `<node>`
+
+
+#### YAML
+[source](donatello/launch/yaml/08-conditional.yaml)
+```yaml
+launch:
+- arg:
+    name: use_number_one
+    default: 'true'
+- include:
+    file: $(find-pkg-share donatello)/launch/yaml/01-single.yaml
+    if: $(var use_number_one)
+- include:
+    file: $(find-pkg-share donatello)/launch/yaml/02-param.yaml
+    unless: $(var use_number_one)
+```
+ * Same behaviors as in ROS 1:
+   * `ros2 launch donatello 08-conditional.launch.py`
+   * `ros2 launch donatello 08-conditional.launch.py use_number_one:=False`
+ * We can add the `if/unless` keys to a variety of launch entities, including `include` and `node`
+
+
 ## 09 - Dynamic Filenames
 
 One other way to dynamically change the contents of a launch file by evaluating substitutions is by using substitutions to determine the filenames.
@@ -503,6 +878,7 @@ One other way to dynamically change the contents of a launch file by evaluating 
  * This method can also be used for changing the filename of an included launch file.
 
 ### ROS 2
+#### Python
 [source](donatello/launch/python/09-dynamic-filename.launch.py)
 ```python
 from launch import LaunchDescription
@@ -531,6 +907,39 @@ def generate_launch_description():
  * Normally, (i.e. section 3 above) we pass a string of the parameters file into the list of parameters for the `Node`.
  * However, now we pass in a list (`dynamic_param_path`), which consists of a mix of strings and `launch.substitutions`, i.e. `LaunchConfiguration`
  * At runtime, the list will be evaluated and combined into one long string representing the path that will be loaded.
+
+
+#### XML
+[source](donatello/launch/xml/09-dynamic-filename.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="config" default="params"/>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param from="$(find-pkg-share donatello)/config/$(var config).yaml"/>
+  </node>
+</launch>
+```
+
+ * Using a substitution to change which yaml file is loaded is a relatively straight-forward application of a substitution when using XML.
+
+
+#### YAML
+[source](donatello/launch/yaml/09-dynamic-filename.yaml)
+```yaml
+launch:
+- arg:
+    name: config
+    default: params
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - from: $(find-pkg-share donatello)/config/$(var config).yaml
+```
+* Using a substitution to change which yaml file is loaded is a relatively straight-forward application of a substitution when using YAML.
+
 
 ## 10 - Make A Node Required
 There are certain scenarios where you want to stop an entire launch file when a particular node is not running anymore.
@@ -589,6 +998,39 @@ def generate_launch_description():
     return LaunchDescription([don_node, five_node, handler])
 ```
  * Thanks to [Alex Moriarty](https://github.com/moriarty) for pointing me to the first method and [The Ubuntu Blog](https://ubuntu.com/blog/ros2-launch-required-nodes) for the second.
+
+
+#### XML
+[source](donatello/launch/xml/10a-required.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <node pkg="donatello" exec="donatello_node" name="does_machines"/>
+  <node pkg="donatello" exec="five_seconds" on_exit="shutdown"/>
+</launch>
+```
+
+ * To make a node required, set the `on_exit` attribute to the string `"shutdown"`
+ * The XML spec is currently very limited, as that is the only value/behavior available.
+
+
+#### YAML
+[source](donatello/launch/yaml/10a-required.yaml)
+```yaml
+launch:
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+- node:
+    pkg: donatello
+    exec: five_seconds
+    on_exit: shutdown
+```
+
+* To make a node required, add the key `on_exit` to the string `"shutdown"` in the `node` dictionary.
+* The YAML spec is currently very limited, as that is the only value/behavior available.
+
 
 ## 11 - Launch from Code
 If you want to start a launch file from a script, you can sometimes use the `subprocess` Python library, but that can lead to problems with the paths. This is how you can launch a launch file in the ROS-y way.
@@ -656,6 +1098,8 @@ As suggested by [Martin Pecka](https://discourse.ros.org/t/rosetta-launch-everyt
 In ROS 1, the iteration had to be done recursively.
 
 ### ROS 2
+
+#### Python
 [source](donatello/launch/python/12-repetition.launch.py)
 ```python
 import launch
@@ -680,6 +1124,37 @@ def generate_launch_description():
 ```
 
 This takes the output of the function `single_node` and repeats it `N` times.
+
+#### XML
+[source](donatello/launch/xml/12-repetition.xml)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="N" default="10"/>
+  <for len="$(var N)" name="i">
+    <node pkg="donatello" exec="donatello_node" name="does_machines$(eval $(index i)+1)"/>
+  </for>
+</launch>
+```
+
+#### YAML
+
+[source](donatello/launch/yaml/12-repetition.yaml)
+```yaml
+launch:
+- arg:
+    name: N
+    default: '10'
+- for:
+    len: $(var N)
+    name: i
+    children:
+    - node:
+        pkg: donatello
+        exec: donatello_node
+        name: does_machines$(eval $(index i)+1)
+```
+
 
 # Other Links
  * ROS 1

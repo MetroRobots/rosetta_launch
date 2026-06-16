@@ -1,0 +1,10 @@
+launch:
+- arg:
+    name: use_number_one
+    default: 'true'
+- include:
+    file: $(find-pkg-share donatello)/launch/yaml/01-single.yaml
+    if: $(var use_number_one)
+- include:
+    file: $(find-pkg-share donatello)/launch/yaml/02-param.yaml
+    unless: $(var use_number_one)

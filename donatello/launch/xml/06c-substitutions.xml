@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="pizza_type" default="mushrooms"/>
+  <arg name="radius" default="1.5"/>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param from="$(find-pkg-share donatello)/config/sub_params.yaml" allow_substs="true"/>
+  </node>
+</launch>

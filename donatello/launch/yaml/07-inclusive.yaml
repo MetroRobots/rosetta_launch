@@ -1,0 +1,6 @@
+launch:
+- include:
+    file: $(find-pkg-share donatello)/launch/yaml/05-arg.yaml
+    let:
+    - name: pizza_type
+      value: peppers

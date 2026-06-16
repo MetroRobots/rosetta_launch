@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="N" default="10"/>
+  <for len="$(var N)" name="i">
+    <node pkg="donatello" exec="donatello_node" name="does_machines$(eval $(index i)+1)"/>
+  </for>
+</launch>

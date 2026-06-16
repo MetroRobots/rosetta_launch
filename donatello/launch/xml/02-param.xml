@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <set_parameter name="use_sim_time" value="true"/>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param name="pizza" value="mushrooms"/>
+    <param name="brothers" value="[leo, mike, raph]"/>
+  </node>
+</launch>
