@@ -3,7 +3,7 @@
   <name>raphael</name>
   <version>0.0.0</version>
   <description>ROS 1 Launch example code for rosetta_launch</description>
-  <maintainer email="davidvlu@gmail.com">David V. Lu!!</maintainer>
+  <maintainer email="david@metrorobots.com">David V. Lu!!</maintainer>
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
   <depend>robot_state_publisher</depend>
