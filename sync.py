@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import pathlib
 import re
+import click
 
 SOURCE_PATTERN = re.compile(
     r'('
@@ -16,6 +17,7 @@ fn = 'README.md'
 s = open(fn).read()
 for whole_match, filepath, source_block, source_type, contents in SOURCE_PATTERN.findall(s):
     if not pathlib.Path(filepath).exists():
+        click.secho(f'Warning: {filepath} does not exist!', fg='yellow')
         continue
 
     if len(source_block) == 1:
