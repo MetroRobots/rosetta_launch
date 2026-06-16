@@ -1,5 +1,6 @@
 from launch import LaunchDescription
-from launch.actions import RegisterEventHandler, LogInfo, EmitEvent, Shutdown
+from launch.actions import RegisterEventHandler, LogInfo, EmitEvent
+from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 
