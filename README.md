@@ -83,11 +83,12 @@ If we want to specify an exact value for a ROS parameter inside of the launch fi
 [source](donatello/launch/python/02-param.launch.py)
 ```python
 from launch import LaunchDescription
-from launch_ros.actions import Node
+from launch_ros.actions import Node, SetParameter
 
 
 def generate_launch_description():
     return LaunchDescription([
+        SetParameter(name='use_sim_time', value='true'),
         Node(name='does_machines',
              package='donatello',
              executable='donatello_node',
@@ -95,7 +96,7 @@ def generate_launch_description():
                           'brothers': ['leo', 'mike', 'raph']}]),
     ])
 ```
- * You cannot set global parameters in ROS 2.
+ * You can set global parameters in ROS 2 using the `SetParameter` action, although this should be used sparingly.
  * The parameters are specified using the `parameters` argument within the Node, which takes a Python list.
  * To specify the values directly, we put them in a dictionary within the Python list.
  * Since the parameters are within Python code, the type is determined by their Python type.
