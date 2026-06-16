@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="pizza_type" default="mushrooms"/>
+  <arg name="radius" default="1.5"/>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param name="pizza" value="$(var pizza_type)"/>
+    <param name="anonymous_name" value="$(anon leo)"/>
+    <param name="favorite_brother" value="$(env BROTHER_NAME mikey)"/>
+    <param name="filename" value="$(filename)"/>
+    <param name="directory" value="$(dirname)"/>
+    <param name="release_exec" value="$(find-exec lsb_release)"/>
+    <param name="release_output" value="$(command 'lsb_release -ds')"/>
+    <param name="version" value="ROS $(env ROS_VERSION)"/>
+    <param name="circumference" value="$(eval 2.*3.1415*$(var radius))"/>
+  </node>
+</launch>

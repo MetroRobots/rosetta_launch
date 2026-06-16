@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <node pkg="donatello" exec="donatello_node" name="does_machines">
+    <param from="$(find-pkg-share donatello)/config/params.yaml"/>
+  </node>
+</launch>

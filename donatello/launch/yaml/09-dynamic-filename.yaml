@@ -1,0 +1,10 @@
+launch:
+- arg:
+    name: config
+    default: params
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - from: $(find-pkg-share donatello)/config/$(var config).yaml

@@ -1,0 +1,12 @@
+launch:
+- arg:
+    name: N
+    default: '10'
+- for:
+    len: $(var N)
+    name: i
+    children:
+    - node:
+        pkg: donatello
+        exec: donatello_node
+        name: does_machines$(eval $(index i)+1)

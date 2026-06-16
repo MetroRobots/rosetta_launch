@@ -54,5 +54,9 @@ repos:
     - --offset
     - '0'
   rev: 0.2.3
+- repo: https://github.com/lsst-ts/pre-commit-xmllint
+  rev: v1.0.0
+  hooks:
+  - id: format-xmllint
 ci:
   autoupdate_schedule: quarterly

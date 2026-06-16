@@ -1,0 +1,9 @@
+launch:
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+- node:
+    pkg: donatello
+    exec: five_seconds
+    on_exit: shutdown

@@ -1,0 +1,30 @@
+launch:
+- arg:
+    name: pizza_type
+    default: mushrooms
+- arg:
+    name: radius
+    default: '1.5'
+- node:
+    pkg: donatello
+    exec: donatello_node
+    name: does_machines
+    param:
+    - name: pizza
+      value: $(var pizza_type)
+    - name: anonymous_name
+      value: $(anon leo)
+    - name: favorite_brother
+      value: $(env BROTHER_NAME mikey)
+    - name: filename
+      value: $(filename)
+    - name: directory
+      value: $(dirname)
+    - name: release_exec
+      value: $(find-exec lsb_release)
+    - name: release_output
+      value: $(command lsb_release)
+    - name: version
+      value: ROS $(env ROS_VERSION)
+    - name: circumference
+      value: $(eval 2.*3.1415*$(var radius))

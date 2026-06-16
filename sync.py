@@ -27,6 +27,8 @@ for whole_match, filepath, source_block, source_type, contents in SOURCE_PATTERN
     contents = open(filepath).read().rstrip()
     if '<launch>' in contents:
         source_type = 'xml'
+    elif 'launch:' in contents:
+        source_type = 'yaml'
     else:
         source_type = 'python'
     new_match = f'[source]({filepath})\n```{source_type}\n{contents}\n```{trail}'

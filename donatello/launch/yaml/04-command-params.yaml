@@ -1,0 +1,7 @@
+launch:
+- node:
+    pkg: robot_state_publisher
+    exec: robot_state_publisher
+    param:
+    - name: robot_description
+      value: $(command "xacro $(find-pkg-share urdf_tutorial)/urdf/01-myfirst.urdf")
