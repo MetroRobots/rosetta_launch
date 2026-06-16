@@ -567,7 +567,8 @@ However, you can also get much more complex, and get the event handling to do th
 [source](donatello/launch/python/10b-required.launch.py)
 ```python
 from launch import LaunchDescription
-from launch.actions import RegisterEventHandler, LogInfo, EmitEvent, Shutdown
+from launch.actions import RegisterEventHandler, LogInfo, EmitEvent
+from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 
