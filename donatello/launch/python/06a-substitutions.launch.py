@@ -12,8 +12,8 @@ def generate_launch_description():
         'favorite_brother': EnvironmentVariable('BROTHER_NAME', default_value='mikey'),
         'filename': ThisLaunchFile(),
         'directory': ThisLaunchFileDir(),
-        'list_exec': FindExecutable(name='ls'),
-        'list_output': Command('ls'),
+        'release_exec': FindExecutable(name='lsb_release'),
+        'release_output': Command('lsb_release -ds'),
         'version': ['ROS ', EnvironmentVariable('ROS_VERSION')],
         'circumference': PythonExpression(['2.*3.1415*', LaunchConfiguration('radius')]),
     }

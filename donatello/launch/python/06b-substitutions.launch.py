@@ -11,8 +11,8 @@ def generate_launch_description():
         'favorite_brother': parse_substitution('$(env BROTHER_NAME mikey)'),
         'filename': parse_substitution('$(filename)'),
         'directory': parse_substitution('$(dirname)'),
-        'list_exec': parse_substitution('$(find-exec ls)'),
-        'list_output': parse_substitution('$(command ls)'),
+        'release_exec': parse_substitution('$(find-exec lsb_release)'),
+        'release_output': parse_substitution('$(command "lsb_release -ds")'),
         'version': parse_substitution('ROS $(env ROS_VERSION)'),
         'circumference': parse_substitution('$(eval 2.*3.1415*$(var radius))'),
     }

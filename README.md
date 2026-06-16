@@ -312,8 +312,8 @@ def generate_launch_description():
         'favorite_brother': EnvironmentVariable('BROTHER_NAME', default_value='mikey'),
         'filename': ThisLaunchFile(),
         'directory': ThisLaunchFileDir(),
-        'list_exec': FindExecutable(name='ls'),
-        'list_output': Command('ls'),
+        'release_exec': FindExecutable(name='lsb_release'),
+        'release_output': Command('lsb_release -ds'),
         'version': ['ROS ', EnvironmentVariable('ROS_VERSION')],
         'circumference': PythonExpression(['2.*3.1415*', LaunchConfiguration('radius')]),
     }
@@ -348,8 +348,8 @@ def generate_launch_description():
         'favorite_brother': parse_substitution('$(env BROTHER_NAME mikey)'),
         'filename': parse_substitution('$(filename)'),
         'directory': parse_substitution('$(dirname)'),
-        'list_exec': parse_substitution('$(find-exec ls)'),
-        'list_output': parse_substitution('$(command ls)'),
+        'release_exec': parse_substitution('$(find-exec lsb_release)'),
+        'release_output': parse_substitution('$(command "lsb_release -ds")'),
         'version': parse_substitution('ROS $(env ROS_VERSION)'),
         'circumference': parse_substitution('$(eval 2.*3.1415*$(var radius))'),
     }
@@ -366,6 +366,7 @@ def generate_launch_description():
 
  * You can also use the dollar substitution syntax as in ROS 1.
  * Using the `parse_substitution` method will result in lists and objects as in the previous example.
+ * Note that the command in the `command` substitution must be surrounded with quotes when it has multiple tokens.
 
 [source](donatello/launch/python/06c-substitutions.launch.py)
 ```python
@@ -395,6 +396,8 @@ def generate_launch_description():
 
 [parameter file source](donatello/config/sub_params.yaml)
  * In ROS distributions [Galactic](https://docs.ros.org/en/galactic/Releases/Release-Galactic-Geochelone.html#use-launch-substitutions-in-parameter-files) and newer, you can also use the substitutions in YAML files as well, as long as `allow_substs` is set to True.
+ * Note that the command in the `command` substitution in the parameter file must be surrounded with quotes when it has multiple tokens.
+ * The way that substitutions are performed in the parameter file is very naive, and it is possible to insert invalid YAML into the parameter file, i.e. if the output of a `command` contains colons or newlines. This will result in an error stating `The substituted parameter file is not a valid yaml file`.
 
 ## 07 - Include Another Launch
 
